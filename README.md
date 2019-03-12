@@ -16,6 +16,7 @@ Libra is a framework designed to ease creating and managing big sets of configur
 **int** - signed 4 byte integer number
 **float** - signed 4 byte floating number
 **boolean** - true / false
+**enumeration** - a single value from predefined set
 **Reference** - a reference pointer from one resource to another one
 **Resource part** - contains a set of field values that. Does not have resource id and cannot be referenced from other resources.
 **Array** - contains multiple values of other types. For non-reference types might contain empty values 
