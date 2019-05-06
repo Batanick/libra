@@ -6,6 +6,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "libraTest", "libraTest\libr
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "libretto", "libretto\libretto.csproj", "{8ECCC042-A75C-4D23-87C3-ECBFC5820998}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "libraUnity", "libraUnity\libraUnity.csproj", "{FD5E92D4-7BD8-443B-9BD5-460F8D0DCDDB}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -24,5 +26,9 @@ Global
 		{8ECCC042-A75C-4D23-87C3-ECBFC5820998}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{8ECCC042-A75C-4D23-87C3-ECBFC5820998}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{8ECCC042-A75C-4D23-87C3-ECBFC5820998}.Release|Any CPU.Build.0 = Release|Any CPU
+		{FD5E92D4-7BD8-443B-9BD5-460F8D0DCDDB}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{FD5E92D4-7BD8-443B-9BD5-460F8D0DCDDB}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{FD5E92D4-7BD8-443B-9BD5-460F8D0DCDDB}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{FD5E92D4-7BD8-443B-9BD5-460F8D0DCDDB}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal

@@ -2,7 +2,10 @@
 
     <PropertyGroup>
         <TargetFramework>netcoreapp2.1</TargetFramework>
-        <LangVersion>4</LangVersion>
     </PropertyGroup>
+
+    <ItemGroup>
+      <ProjectReference Include="..\libra\libra.csproj" />
+    </ItemGroup>
 
 </Project>
