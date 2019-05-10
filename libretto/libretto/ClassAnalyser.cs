@@ -1,4 +1,5 @@
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
@@ -48,7 +49,7 @@ namespace libretto.libretto
             {
                 result.Add(ProcessType(res, true));
             }
-            
+
             foreach (var part in _parts)
             {
                 result.Add(ProcessType(part, false));
@@ -69,13 +70,13 @@ namespace libretto.libretto
                 {
                     continue;
                 }
-                
+
                 if (resource && info.Name == nameof(Resource.ResourceId))
                 {
                     continue;
                 }
-                
-                var processed = ProcessInfoProperty(info);
+
+                var processed = ProcessProperty(info);
                 if (processed != null)
                 {
                     props.Add(processed);
@@ -89,21 +90,43 @@ namespace libretto.libretto
             };
         }
 
-        private PropertyInfo ProcessInfoProperty(System.Reflection.PropertyInfo info)
+        private PropertyInfo ProcessProperty(System.Reflection.PropertyInfo info)
         {
             var title = ReflectionHelper.GetPropertyTitle(info);
-            var name = info.Name;
 
-            if (info.PropertyType.IsGenericType && info.PropertyType.GetGenericTypeDefinition() == typeof(ResourceRef<>))
+            if (info.PropertyType.IsArray || typeof(ICollection).IsAssignableFrom(info.PropertyType))
             {
-                var resType = info.PropertyType.GetGenericArguments()[0];
+                var elementType = GetElementType(info.PropertyType);
+                var elementInfo = ProcessInfoProperty(info.Name, title, elementType);
+                
+                // do not care here, since all info would be in the parent PropertyInfo
+                elementInfo.Name = null;
+                elementInfo.Title = null;
+
+                return new PropertyInfo
+                {
+                    Name = info.Name,
+                    Title = title,
+                    Elements = elementInfo,
+                    Type = ObjectType.Array
+                };
+            }
+
+            return ProcessInfoProperty(info.Name, title, info.PropertyType);
+        }
+
+        private PropertyInfo ProcessInfoProperty(string name, string title, Type type)
+        {
+            if (type.IsGenericType && type.GetGenericTypeDefinition() == typeof(ResourceRef<>))
+            {
+                var resType = type.GetGenericArguments()[0];
                 var compatibleTypes = GetCompatibleTypes(_resources, resType);
                 if (compatibleTypes.Count == 0)
                 {
-                    _log.Warn($"Unable to find potential reference candidates for: {resType.Name}, ignoring {info.Name}");
+                    _log.Warn($"Unable to find potential reference candidates for: {resType.Name}, ignoring {name}");
                     return null;
                 }
-                
+
                 return new PropertyInfo
                 {
                     Name = name,
@@ -113,15 +136,15 @@ namespace libretto.libretto
                 };
             }
 
-            if (IsPart(info.PropertyType))
+            if (IsPart(type))
             {
-                var compatibleTypes = GetCompatibleTypes(_parts, info.PropertyType);
+                var compatibleTypes = GetCompatibleTypes(_parts, type);
                 if (compatibleTypes.Count == 0)
                 {
-                    _log.Warn($"Unable to find potential candidates for: {info.PropertyType.Name}, ignoring {info.Name}");
+                    _log.Warn($"Unable to find potential candidates for: {type.Name}, ignoring {name}");
                     return null;
                 }
-                
+
                 return new PropertyInfo
                 {
                     Name = name,
@@ -130,18 +153,18 @@ namespace libretto.libretto
                     AllowedTypes = compatibleTypes
                 };
             }
-            
-            if (PrimitiveTypesMapping.TryGetValue(info.PropertyType, out var type))
+
+            if (PrimitiveTypesMapping.TryGetValue(type, out var objectType))
             {
                 return new PropertyInfo
                 {
                     Name = name,
                     Title = title,
-                    Type = type
+                    Type = objectType
                 };
             }
 
-            throw new LibrettoException($"Unable process property: {info.DeclaringType.FullName}/{info.Name}");
+            throw new LibrettoException($"Unable process property {name}, unknown type: {type}");
         }
 
         private List<string> GetCompatibleTypes(List<Type> types, Type expected)
@@ -171,6 +194,11 @@ namespace libretto.libretto
         private static bool IsResource(Type t)
         {
             return t.IsSubclassOf(typeof(Resource));
+        }
+
+        public static Type GetElementType(Type type)
+        {
+            return type.IsArray ? type.GetElementType() : type.GetGenericArguments()[0];
         }
     }
 }

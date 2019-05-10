@@ -2,6 +2,6 @@ namespace libretto.libretto.model
 {
     public enum ObjectType
     {
-        Object, Ref, Integer, Number, String, Boolean
+        Object, Ref, Integer, Number, String, Boolean, Array
     }
 }
