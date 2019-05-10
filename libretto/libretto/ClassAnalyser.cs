@@ -7,6 +7,7 @@ using libretto.libretto.exceptions;
 using libretto.libretto.model;
 using libretto.libretto.utils;
 using NLog;
+using PropertyInfo = libretto.libretto.model.PropertyInfo;
 
 namespace libretto.libretto
 {
@@ -14,7 +15,7 @@ namespace libretto.libretto
     {
         private static Logger _log = LogManager.GetLogger(nameof(ClassAnalyser));
 
-        private static readonly Dictionary<Type, ObjectType> primitiveTypesMapping = new Dictionary<Type, ObjectType>
+        private static readonly Dictionary<Type, ObjectType> PrimitiveTypesMapping = new Dictionary<Type, ObjectType>
         {
             {typeof(long), ObjectType.Integer},
             {typeof(int), ObjectType.Integer},
@@ -56,9 +57,38 @@ namespace libretto.libretto
         {
             _log.Info($"Processing: {t.Name}");
             var name = ReflectionHelper.GetResourceName(t);
+
+            var props = new List<PropertyInfo>();
+            foreach (var info in t.GetProperties())
+            {
+                var processed = ProcessInfoProperty(info);
+                if (processed != null)
+                {
+                    props.Add(processed);
+                }
+            }
+
             return new ResourceType
             {
-                Id = name
+                Id = name,
+                Properties = props
+            };
+        }
+
+        private static PropertyInfo ProcessInfoProperty(System.Reflection.PropertyInfo info)
+        {
+            var name = ReflectionHelper.GetPropertyName(info);
+            if (!PrimitiveTypesMapping.TryGetValue(info.PropertyType, out var type))
+            {
+                _log.Warn($"Unable to process property of type ${info.PropertyType}, ignoring");
+                return null;
+            }
+
+            return new PropertyInfo
+            {
+                Name = name,
+                Title = name,
+                Type = type
             };
         }
 

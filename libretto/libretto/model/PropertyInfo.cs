@@ -1,6 +1,6 @@
 namespace libretto.libretto.model
 {
-    public class ProperyInfo
+    public class PropertyInfo
     {
         public string Name { get; set; }
         public string Title { get; set; }

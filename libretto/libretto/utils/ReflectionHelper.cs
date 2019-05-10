@@ -1,5 +1,6 @@
 using System;
 using System.Linq;
+using System.Reflection;
 using libra.core;
 using libra.core.attribs;
 using libretto.libretto.exceptions;
@@ -24,6 +25,14 @@ namespace libretto.libretto.utils
                 .Cast<ResourceNameAttribute>()
                 .FirstOrDefault();
             return customName == null ? resType.Name : customName.Name;
+        }
+        
+        public static string GetPropertyName(PropertyInfo info)
+        {
+            var customName = info.GetCustomAttributes(typeof(PropertyNameAttribute), false)
+                .Cast<ResourceNameAttribute>()
+                .FirstOrDefault();
+            return customName == null ? info.Name : customName.Name;
         }
     }
 }

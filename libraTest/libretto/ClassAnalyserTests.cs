@@ -54,7 +54,7 @@ namespace libraTest.libretto
             AreEqual(1, propInfos.Count);
 
             var prop = propInfos.First();
-            AreEqual(propName, prop);
+            AreEqual(propName, prop.Name);
             AreEqual(objType, prop.Type);
         } 
     }
