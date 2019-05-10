@@ -1,7 +1,8 @@
+// ReSharper disable InconsistentNaming
 namespace libretto.model
 {
     public enum ObjectType
     {
-        Object, Ref, Integer, Number, String, Boolean, Array
+        obj, @ref, integer, number, @string, boolean, array
     }
 }

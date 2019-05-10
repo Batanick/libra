@@ -8,7 +8,10 @@ namespace libretto
         
         public string Serialize(ResourceType resType)
         {
-            return JsonConvert.SerializeObject(resType, Formatting.Indented);    
+            return JsonConvert.SerializeObject(resType, Formatting.Indented, new JsonSerializerSettings
+            {
+                NullValueHandling = NullValueHandling.Ignore
+            });    
         }
     }
 }

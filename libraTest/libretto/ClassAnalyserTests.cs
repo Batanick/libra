@@ -2,7 +2,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using libra.core;
-using libretto.libretto;
+using libretto;
 using libretto.model;
 using NUnit.Framework;
 using static NUnit.Framework.Assert;
@@ -34,15 +34,15 @@ namespace libraTest.libretto
         {
             var resourceType = _typeInfo.First(r => r.Id == nameof(BaseTypesResource));
 
-            AssertProp(resourceType, nameof(BaseTypesResource.IntField), ObjectType.Integer);
-            AssertProp(resourceType, nameof(BaseTypesResource.LongField), ObjectType.Integer);
-            AssertProp(resourceType, nameof(BaseTypesResource.ByteField), ObjectType.Integer);
+            AssertProp(resourceType, nameof(BaseTypesResource.IntField), ObjectType.integer);
+            AssertProp(resourceType, nameof(BaseTypesResource.LongField), ObjectType.integer);
+            AssertProp(resourceType, nameof(BaseTypesResource.ByteField), ObjectType.integer);
 
-            AssertProp(resourceType, nameof(BaseTypesResource.FloatField), ObjectType.Number);
-            AssertProp(resourceType, nameof(BaseTypesResource.DoubleField), ObjectType.Number);
+            AssertProp(resourceType, nameof(BaseTypesResource.FloatField), ObjectType.number);
+            AssertProp(resourceType, nameof(BaseTypesResource.DoubleField), ObjectType.number);
 
-            AssertProp(resourceType, nameof(BaseTypesResource.StringField), ObjectType.String);
-            AssertProp(resourceType, nameof(BaseTypesResource.BoolField), ObjectType.Boolean);
+            AssertProp(resourceType, nameof(BaseTypesResource.StringField), ObjectType.@string);
+            AssertProp(resourceType, nameof(BaseTypesResource.BoolField), ObjectType.boolean);
         }
 
         [Test]
@@ -64,15 +64,15 @@ namespace libraTest.libretto
         {
             var resourceType = _typeInfo.First(r => r.Id == nameof(DerivedResource));
 
-            AssertProp(resourceType, nameof(AbstractResource.BaseClassProp), ObjectType.Integer);
-            AssertProp(resourceType, nameof(DerivedResource.DerivedClassProp), ObjectType.String);
+            AssertProp(resourceType, nameof(AbstractResource.BaseClassProp), ObjectType.integer);
+            AssertProp(resourceType, nameof(DerivedResource.DerivedClassProp), ObjectType.@string);
         }
 
         [Test]
         public void ReferenceField_Processed()
         {
             var resourceType = _typeInfo.First(r => r.Id == nameof(ReferencingResource));
-            var prop = AssertProp(resourceType, nameof(ReferencingResource.Reference), ObjectType.Ref);
+            var prop = AssertProp(resourceType, nameof(ReferencingResource.Reference), ObjectType.@ref);
 
             Contains(nameof(DerivedResource), prop.AllowedTypes);
             Contains(nameof(AnotherDerivedResource), prop.AllowedTypes);
@@ -83,9 +83,9 @@ namespace libraTest.libretto
         public void CustomFieldsInfo_Correct()
         {
             var resourceType = _typeInfo.First(r => r.Id == nameof(CustomPropertiesResource));
-            AssertProp(resourceType, nameof(CustomPropertiesResource.JustProperty), ObjectType.Integer);
+            AssertProp(resourceType, nameof(CustomPropertiesResource.JustProperty), ObjectType.integer);
 
-            var custom = AssertProp(resourceType, nameof(CustomPropertiesResource.CustomTitleProperty), ObjectType.Boolean);
+            var custom = AssertProp(resourceType, nameof(CustomPropertiesResource.CustomTitleProperty), ObjectType.boolean);
             AreEqual("CustomTitle", custom.Title);
 
             IsFalse(resourceType.Properties.Any(p => p.Name == nameof(CustomPropertiesResource.IgnoredProperty)));
@@ -103,7 +103,7 @@ namespace libraTest.libretto
         public void PartField_Analysed()
         {
             var resourceType = _typeInfo.First(r => r.Id == nameof(NestingPartResource));
-            var propertyInfo = AssertProp(resourceType, nameof(NestingPartResource.Part), ObjectType.Object);
+            var propertyInfo = AssertProp(resourceType, nameof(NestingPartResource.Part), ObjectType.obj);
             Contains(nameof(ResourcePart), propertyInfo.AllowedTypes);
             Contains(nameof(ResourcePart2), propertyInfo.AllowedTypes);
             IsFalse(propertyInfo.AllowedTypes.Contains(nameof(AbstractResourcePart)));
@@ -113,29 +113,29 @@ namespace libraTest.libretto
         public void ResourcePartFields_Processed()
         {
             var resourceType = _typeInfo.First(r => r.Id == nameof(ResourcePart2));
-            AssertProp(resourceType, nameof(ResourcePart2.BoolField), ObjectType.Boolean);
-            AssertProp(resourceType, nameof(ResourcePart2.IntField), ObjectType.Integer);
-            AssertProp(resourceType, nameof(ResourcePart2.StringField), ObjectType.String);
+            AssertProp(resourceType, nameof(ResourcePart2.BoolField), ObjectType.boolean);
+            AssertProp(resourceType, nameof(ResourcePart2.IntField), ObjectType.integer);
+            AssertProp(resourceType, nameof(ResourcePart2.StringField), ObjectType.@string);
         }
-        
+
         [Test]
         public void ArrayClass_Processed()
         {
             var resourceType = _typeInfo.First(r => r.Id == nameof(ArrayResource));
 
-            var intList = AssertProp(resourceType, nameof(ArrayResource.IntList), ObjectType.Array);
-            AreEqual(ObjectType.Integer, intList.Elements.Type);
-            var partList = AssertProp(resourceType, nameof(ArrayResource.PartList), ObjectType.Array);
-            AreEqual(ObjectType.Object, partList.Elements.Type);
-            var resList = AssertProp(resourceType, nameof(ArrayResource.ResourceList), ObjectType.Array);
-            AreEqual(ObjectType.Ref, resList.Elements.Type);
-            
-            var floatArr = AssertProp(resourceType, nameof(ArrayResource.FloatArray), ObjectType.Array);
-            AreEqual(ObjectType.Number, floatArr.Elements.Type);
-            var partArr = AssertProp(resourceType, nameof(ArrayResource.PartArray), ObjectType.Array);
-            AreEqual(ObjectType.Object, partArr.Elements.Type);
-            var resArr = AssertProp(resourceType, nameof(ArrayResource.ResourceArray), ObjectType.Array);
-            AreEqual(ObjectType.Ref, resArr.Elements.Type);
+            var intList = AssertProp(resourceType, nameof(ArrayResource.IntList), ObjectType.array);
+            AreEqual(ObjectType.integer, intList.Elements.Type);
+            var partList = AssertProp(resourceType, nameof(ArrayResource.PartList), ObjectType.array);
+            AreEqual(ObjectType.obj, partList.Elements.Type);
+            var resList = AssertProp(resourceType, nameof(ArrayResource.ResourceList), ObjectType.array);
+            AreEqual(ObjectType.@ref, resList.Elements.Type);
+
+            var floatArr = AssertProp(resourceType, nameof(ArrayResource.FloatArray), ObjectType.array);
+            AreEqual(ObjectType.number, floatArr.Elements.Type);
+            var partArr = AssertProp(resourceType, nameof(ArrayResource.PartArray), ObjectType.array);
+            AreEqual(ObjectType.obj, partArr.Elements.Type);
+            var resArr = AssertProp(resourceType, nameof(ArrayResource.ResourceArray), ObjectType.array);
+            AreEqual(ObjectType.@ref, resArr.Elements.Type);
         }
 
         private static PropertyInfo AssertProp(ResourceType type, string propName, ObjectType objType)

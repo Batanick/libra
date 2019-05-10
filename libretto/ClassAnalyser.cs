@@ -10,7 +10,7 @@ using libretto.utils;
 using NLog;
 using PropertyInfo = libretto.model.PropertyInfo;
 
-namespace libretto.libretto
+namespace libretto
 {
     public class ClassAnalyser
     {
@@ -18,15 +18,15 @@ namespace libretto.libretto
 
         private static readonly Dictionary<Type, ObjectType> PrimitiveTypesMapping = new Dictionary<Type, ObjectType>
         {
-            {typeof(long), ObjectType.Integer},
-            {typeof(int), ObjectType.Integer},
-            {typeof(byte), ObjectType.Integer},
+            {typeof(long), ObjectType.integer},
+            {typeof(int), ObjectType.integer},
+            {typeof(byte), ObjectType.integer},
 
-            {typeof(float), ObjectType.Number},
-            {typeof(double), ObjectType.Number},
+            {typeof(float), ObjectType.number},
+            {typeof(double), ObjectType.number},
 
-            {typeof(string), ObjectType.String},
-            {typeof(bool), ObjectType.Boolean}
+            {typeof(string), ObjectType.@string},
+            {typeof(bool), ObjectType.boolean}
         };
 
         private readonly List<Type> _resources = new List<Type>();
@@ -108,7 +108,7 @@ namespace libretto.libretto
                     Name = info.Name,
                     Title = title,
                     Elements = elementInfo,
-                    Type = ObjectType.Array
+                    Type = ObjectType.array
                 };
             }
 
@@ -130,7 +130,7 @@ namespace libretto.libretto
                 return new PropertyInfo
                 {
                     Name = name,
-                    Type = ObjectType.Ref,
+                    Type = ObjectType.@ref,
                     Title = title,
                     AllowedTypes = compatibleTypes
                 };
@@ -148,7 +148,7 @@ namespace libretto.libretto
                 return new PropertyInfo
                 {
                     Name = name,
-                    Type = ObjectType.Object,
+                    Type = ObjectType.obj,
                     Title = title,
                     AllowedTypes = compatibleTypes
                 };

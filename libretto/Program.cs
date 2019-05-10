@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Reflection;
-using libretto.libretto;
 using libretto.model;
 using Mono.Options;
 using NLog;
@@ -43,7 +42,6 @@ namespace libretto
             try
             {
                 var extra = p.Parse(args);
-
                 var assemblies = new List<Assembly>();
                 foreach (var path in extra)
                 {
