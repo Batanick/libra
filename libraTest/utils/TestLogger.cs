@@ -6,9 +6,9 @@ namespace libraTest.core
 {
     public class TestLogger : IResourceLogger
     {
-        private readonly NLog.Logger _logger;
+        private readonly Logger _logger;
 
-        private TestLogger(NLog.Logger logger)
+        private TestLogger(Logger logger)
         {
             _logger = logger;
         }

@@ -5,16 +5,16 @@ namespace libra.core.attribs
     [AttributeUsage(AttributeTargets.Class, Inherited = false)]
     public class ResourceNameAttribute  : Attribute
     {
-        private readonly string name;
+        private readonly string _name;
 
         public ResourceNameAttribute(string name)
         {
-            this.name = name;
+            _name = name;
         }
         
         public string Name {
             get {
-                return name;
+                return _name;
             }
         }
     }

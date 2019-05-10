@@ -23,12 +23,39 @@ namespace libraTest.libretto
         public void AnalyseAssembly_FoundResources()
         {
             IsNotEmpty(_typeInfo);
-            _typeInfo.Select(s => )
+            Contains("Grumpy", _typeInfo.Select(t => t.Id ).ToList());
+            Contains(nameof(NamelessResource), _typeInfo.Select(t => t.Id ).ToList());
         }
 
-        public static string NameOf()
+        [Test]
+        public void SimpleFields_Analysed()
         {
+            var resourceType = _typeInfo.First(r => r.Id == nameof(BaseTypesResource));
             
+            AssertProp(resourceType, nameof(BaseTypesResource.IntField), ObjectType.Integer);
+            AssertProp(resourceType, nameof(BaseTypesResource.LongField), ObjectType.Integer);
+            AssertProp(resourceType, nameof(BaseTypesResource.ByteField), ObjectType.Integer);
+            
+            AssertProp(resourceType, nameof(BaseTypesResource.FloatField), ObjectType.Number);
+            AssertProp(resourceType, nameof(BaseTypesResource.DoubleField), ObjectType.Number);
+            
+            AssertProp(resourceType, nameof(BaseTypesResource.StringField), ObjectType.String);
+            AssertProp(resourceType, nameof(BaseTypesResource.BoolField), ObjectType.Boolean);
         }
+
+        private static void AssertProp(ResourceType type, string propName, ObjectType objType)
+        {
+            var props = type.Properties;
+            IsNotNull(props);
+            IsNotEmpty(props);
+
+            var propInfos = props.Where(p => p.Name == propName).ToList();
+            IsNotEmpty(propInfos);
+            AreEqual(1, propInfos.Count);
+
+            var prop = propInfos.First();
+            AreEqual(propName, prop);
+            AreEqual(objType, prop.Type);
+        } 
     }
 }
