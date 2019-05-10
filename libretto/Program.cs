@@ -2,10 +2,12 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Reflection;
-using System.Threading;
 using libretto.libretto;
+using libretto.model;
 using Mono.Options;
 using NLog;
+using NLog.Config;
+using NLog.Targets;
 
 namespace libretto
 {
@@ -16,7 +18,7 @@ namespace libretto
         public static void Main(string[] args)
         {
             InitLogger();
-            
+
             bool showHelp = false;
             var dir = "./";
 
@@ -50,7 +52,8 @@ namespace libretto
                     assemblies.Add(assembly);
                 }
 
-                AnalyseAssembly(assemblies);
+                var results = AnalyseAssembly(assemblies);
+                SerializeResults(dir, results);
             }
             catch (Exception e)
             {
@@ -60,12 +63,31 @@ namespace libretto
             }
         }
 
-        private static void AnalyseAssembly(List<Assembly> assemblies)
+        private static List<ResourceType> AnalyseAssembly(List<Assembly> assemblies)
         {
             _log.Info($"Analysing:");
             var classAnalyser = new ClassAnalyser();
             var resourceTypes = classAnalyser.Process(assemblies);
             _log.Info($"Finished: total {resourceTypes.Count} resource types");
+            return resourceTypes;
+        }
+
+        private static void SerializeResults(string dir, List<ResourceType> resourceTypes)
+        {
+            _log.Info($"Saving results to {dir}");
+            var serializer = new JsonSerializer();
+
+            foreach (var type in resourceTypes)
+            {
+                var content = serializer.Serialize(type);
+                var path = Path.Combine(dir, ToFileName(type));
+                _log.Info($"Writing: {path}");
+                using (var file = new StreamWriter(path))
+                {
+                    file.Write(content);
+                }
+            }
+            _log.Info("Done");
         }
 
         private static void ShowHelp(OptionSet p)
@@ -75,15 +97,20 @@ namespace libretto
             Console.WriteLine("Options:");
             p.WriteOptionDescriptions(Console.Out);
         }
-        
+
         private static void InitLogger()
         {
-            var config = new NLog.Config.LoggingConfiguration();
+            var config = new LoggingConfiguration();
 
-            var logconsole = new NLog.Targets.ConsoleTarget("logconsole");
+            var logconsole = new ConsoleTarget("logconsole");
             config.AddRule(LogLevel.Debug, LogLevel.Fatal, logconsole);
 
             LogManager.Configuration = config;
+        }
+
+        private static string ToFileName(ResourceType type)
+        {
+            return $"{type.Id}.schema.json";
         }
     }
 }

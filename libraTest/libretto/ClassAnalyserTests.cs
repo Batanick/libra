@@ -3,10 +3,10 @@ using System.Linq;
 using System.Reflection;
 using libra.core;
 using libretto.libretto;
-using libretto.libretto.model;
+using libretto.model;
 using NUnit.Framework;
 using static NUnit.Framework.Assert;
-using PropertyInfo = libretto.libretto.model.PropertyInfo;
+using PropertyInfo = libretto.model.PropertyInfo;
 
 namespace libraTest.libretto
 {

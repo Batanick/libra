@@ -1,4 +1,4 @@
-namespace libretto.libretto.model
+namespace libretto.model
 {
     public enum ObjectType
     {

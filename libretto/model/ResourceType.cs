@@ -1,6 +1,6 @@
 using System.Collections.Generic;
 
-namespace libretto.libretto.model
+namespace libretto.model
 {
     public class ResourceType
     {

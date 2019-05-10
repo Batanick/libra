@@ -4,11 +4,11 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using libra.core;
-using libretto.libretto.exceptions;
-using libretto.libretto.model;
-using libretto.libretto.utils;
+using libretto.exceptions;
+using libretto.model;
+using libretto.utils;
 using NLog;
-using PropertyInfo = libretto.libretto.model.PropertyInfo;
+using PropertyInfo = libretto.model.PropertyInfo;
 
 namespace libretto.libretto
 {

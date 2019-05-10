@@ -3,9 +3,9 @@ using System.Linq;
 using System.Reflection;
 using libra.core;
 using libra.core.attribs;
-using libretto.libretto.exceptions;
+using libretto.exceptions;
 
-namespace libretto.libretto.utils
+namespace libretto.utils
 {
     public static class ReflectionHelper
     {

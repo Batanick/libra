@@ -1,6 +1,6 @@
 using System;
 
-namespace libretto.libretto.exceptions
+namespace libretto.exceptions
 {
     public class LibrettoException : Exception
     {
