@@ -100,13 +100,22 @@ namespace libraTest.libretto
         }
 
         [Test]
-        public void ResourcePartField_Analysed()
+        public void PartField_Analysed()
         {
             var resourceType = _typeInfo.First(r => r.Id == nameof(NestingPartResource));
             var propertyInfo = AssertProp(resourceType, nameof(NestingPartResource.Part), ObjectType.Object);
             Contains(nameof(ResourcePart), propertyInfo.AllowedTypes);
             Contains(nameof(ResourcePart2), propertyInfo.AllowedTypes);
             IsFalse(propertyInfo.AllowedTypes.Contains(nameof(AbstractResourcePart)));
+        }
+
+        [Test]
+        public void ResourcePartFields_Processed()
+        {
+            var resourceType = _typeInfo.First(r => r.Id == nameof(ResourcePart2));
+            AssertProp(resourceType, nameof(ResourcePart2.BoolField), ObjectType.Boolean);
+            AssertProp(resourceType, nameof(ResourcePart2.IntField), ObjectType.Integer);
+            AssertProp(resourceType, nameof(ResourcePart2.StringField), ObjectType.String);
         }
 
         private static PropertyInfo AssertProp(ResourceType type, string propName, ObjectType objType)
