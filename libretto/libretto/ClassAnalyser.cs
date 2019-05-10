@@ -28,32 +28,36 @@ namespace libretto.libretto
             {typeof(bool), ObjectType.Boolean}
         };
 
+        private readonly List<Type> _resources = new List<Type>();
+        private readonly List<Type> _parts = new List<Type>();
+
         public List<ResourceType> Process(List<Assembly> assemblies)
         {
             var types = assemblies
                 .SelectMany(a => a.GetTypes())
                 .Where(t => !t.IsAbstract)
+                .Where(t => !t.IsInterface)
                 .ToList();
 
             CheckTypes(types);
 
             var result = new List<ResourceType>();
-            var resTypes = types.Where(IsResource).ToList();
-            foreach (var res in resTypes)
+            _resources.AddRange(types.Where(IsResource));
+            foreach (var res in _resources)
             {
-                result.Add(ProcessType(res));
+                result.Add(ProcessType(res, true));
             }
 
-            var partTypes = types.Where(IsPart).ToList();
-            foreach (var res in partTypes)
+            _parts.AddRange(types.Where(IsPart));
+            foreach (var part in _parts)
             {
-                result.Add(ProcessType(res));
+                result.Add(ProcessType(part, false));
             }
 
             return result;
         }
 
-        private static ResourceType ProcessType(Type t)
+        private ResourceType ProcessType(Type t, bool resource)
         {
             _log.Info($"Processing: {t.Name}");
             var name = ReflectionHelper.GetResourceName(t);
@@ -61,6 +65,16 @@ namespace libretto.libretto
             var props = new List<PropertyInfo>();
             foreach (var info in t.GetProperties())
             {
+                if (ReflectionHelper.Ignored(info))
+                {
+                    continue;
+                }
+                
+                if (resource && info.Name == nameof(Resource.ResourceId))
+                {
+                    continue;
+                }
+                
                 var processed = ProcessInfoProperty(info);
                 if (processed != null)
                 {
@@ -75,24 +89,52 @@ namespace libretto.libretto
             };
         }
 
-        private static PropertyInfo ProcessInfoProperty(System.Reflection.PropertyInfo info)
+        private PropertyInfo ProcessInfoProperty(System.Reflection.PropertyInfo info)
         {
-            var name = ReflectionHelper.GetPropertyName(info);
-            if (!PrimitiveTypesMapping.TryGetValue(info.PropertyType, out var type))
+            var title = ReflectionHelper.GetPropertyTitle(info);
+            var name = info.Name;
+
+            if (info.PropertyType.IsGenericType && info.PropertyType.GetGenericTypeDefinition() == typeof(ResourceRef<>))
             {
-                _log.Warn($"Unable to process property of type ${info.PropertyType}, ignoring");
-                return null;
+                var resType = info.PropertyType.GetGenericArguments()[0];
+                var compatibleTypes = GetCompatibleTypes(_resources, resType);
+                if (compatibleTypes.Count == 0)
+                {
+                    _log.Warn($"Unable to find potential reference candidates for: {resType.Name}, ignoring");
+                    return null;
+                }
+                
+                return new PropertyInfo
+                {
+                    Name = name,
+                    Type = ObjectType.Ref,
+                    Title = title,
+                    AllowedTypes = compatibleTypes
+                };
+            }
+            
+            if (PrimitiveTypesMapping.TryGetValue(info.PropertyType, out var type))
+            {
+                return new PropertyInfo
+                {
+                    Name = name,
+                    Title = title,
+                    Type = type
+                };
             }
 
-            return new PropertyInfo
-            {
-                Name = name,
-                Title = name,
-                Type = type
-            };
+            throw new LibrettoException($"Unable process property: {info.DeclaringType.FullName}/{info.Name}");
         }
 
-        private static void CheckTypes(List<Type> types)
+        private List<string> GetCompatibleTypes(List<Type> types, Type expected)
+        {
+            return types
+                .Where(expected.IsAssignableFrom)
+                .Select(ReflectionHelper.GetResourceName)
+                .ToList();
+        }
+
+        private void CheckTypes(List<Type> types)
         {
             var brokenTypes = types
                 .Where(t => IsPart(t) && IsResource(t))

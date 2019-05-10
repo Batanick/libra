@@ -3,7 +3,7 @@ using System;
 namespace libra.core.attribs
 {
     [AttributeUsage(AttributeTargets.Class, Inherited = false)]
-    public class ResourceNameAttribute  : Attribute
+    public class ResourceNameAttribute : Attribute
     {
         private readonly string _name;
 
@@ -11,11 +11,10 @@ namespace libra.core.attribs
         {
             _name = name;
         }
-        
-        public string Name {
-            get {
-                return _name;
-            }
+
+        public string Name
+        {
+            get { return _name; }
         }
     }
 }

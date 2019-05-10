@@ -26,13 +26,20 @@ namespace libretto.libretto.utils
                 .FirstOrDefault();
             return customName == null ? resType.Name : customName.Name;
         }
-        
-        public static string GetPropertyName(PropertyInfo info)
+
+        public static string GetPropertyTitle(PropertyInfo info)
         {
-            var customName = info.GetCustomAttributes(typeof(PropertyNameAttribute), false)
-                .Cast<ResourceNameAttribute>()
+            var customName = info.GetCustomAttributes(typeof(TitleAttribute), false)
+                .Cast<TitleAttribute>()
                 .FirstOrDefault();
             return customName == null ? info.Name : customName.Name;
+        }
+
+        public static bool Ignored(PropertyInfo info)
+        {
+            return info
+                .GetCustomAttributes(typeof(Ignore), false)
+                .Any();
         }
     }
 }

@@ -6,6 +6,7 @@ using libretto.libretto;
 using libretto.libretto.model;
 using NUnit.Framework;
 using static NUnit.Framework.Assert;
+using PropertyInfo = libretto.libretto.model.PropertyInfo;
 
 namespace libraTest.libretto
 {
@@ -67,7 +68,30 @@ namespace libraTest.libretto
             AssertProp(resourceType, nameof(DerivedResource.DerivedClassProp), ObjectType.String);
         }
 
-        private static void AssertProp(ResourceType type, string propName, ObjectType objType)
+        [Test]
+        public void ReferenceField_Processed()
+        {
+            var resourceType = _typeInfo.First(r => r.Id == nameof(ReferencingResource));
+            var prop = AssertProp(resourceType, nameof(ReferencingResource.Reference), ObjectType.Ref);
+
+            Contains(nameof(DerivedResource), prop.AllowedTypes);
+            Contains(nameof(AnotherDerivedResource), prop.AllowedTypes);
+            False(prop.AllowedTypes.Contains(nameof(AbstractDerivedResource)));
+        }
+
+        [Test]
+        public void CustomFieldsInfo_Correct()
+        {
+            var resourceType = _typeInfo.First(r => r.Id == nameof(CustomPropertiesResource));
+            AssertProp(resourceType, nameof(CustomPropertiesResource.JustProperty), ObjectType.Integer);
+
+            var custom = AssertProp(resourceType, nameof(CustomPropertiesResource.CustomTitleProperty), ObjectType.Boolean);
+            AreEqual("CustomTitle", custom.Title);
+
+            IsFalse(resourceType.Properties.Any(p => p.Name == nameof(CustomPropertiesResource.IgnoredProperty)));
+        }
+
+        private static PropertyInfo AssertProp(ResourceType type, string propName, ObjectType objType)
         {
             var props = type.Properties;
             IsNotNull(props);
@@ -80,6 +104,8 @@ namespace libraTest.libretto
             var prop = propInfos.First();
             AreEqual(propName, prop.Name);
             AreEqual(objType, prop.Type);
+
+            return prop;
         }
     }
 }

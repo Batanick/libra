@@ -2,12 +2,12 @@ using System;
 
 namespace libra.core.attribs
 {
-    [AttributeUsage(AttributeTargets.Class)]
-    public class PropertyNameAttribute : Attribute
+    [AttributeUsage(AttributeTargets.Property)]
+    public class TitleAttribute : Attribute
     {
         private readonly string _name;
 
-        public PropertyNameAttribute(string name)
+        public TitleAttribute(string name)
         {
             _name = name;
         }
