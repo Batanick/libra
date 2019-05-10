@@ -91,6 +91,24 @@ namespace libraTest.libretto
             IsFalse(resourceType.Properties.Any(p => p.Name == nameof(CustomPropertiesResource.IgnoredProperty)));
         }
 
+        [Test]
+        public void ResourcePartsInfo_Processed()
+        {
+            Contains(nameof(ResourcePart), _typeInfo.Select(r => r.Id).ToList());
+            Contains(nameof(ResourcePart2), _typeInfo.Select(r => r.Id).ToList());
+            IsFalse(_typeInfo.Select(r => r.Id).Contains(nameof(AbstractResourcePart)));
+        }
+
+        [Test]
+        public void ResourcePartField_Analysed()
+        {
+            var resourceType = _typeInfo.First(r => r.Id == nameof(NestingPartResource));
+            var propertyInfo = AssertProp(resourceType, nameof(NestingPartResource.Part), ObjectType.Object);
+            Contains(nameof(ResourcePart), propertyInfo.AllowedTypes);
+            Contains(nameof(ResourcePart2), propertyInfo.AllowedTypes);
+            IsFalse(propertyInfo.AllowedTypes.Contains(nameof(AbstractResourcePart)));
+        }
+
         private static PropertyInfo AssertProp(ResourceType type, string propName, ObjectType objType)
         {
             var props = type.Properties;

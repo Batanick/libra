@@ -9,9 +9,9 @@ namespace libretto.libretto.utils
 {
     public static class ReflectionHelper
     {
-        public static string GetResourceName(Type resType)
+        public static string GetName(Type resType)
         {
-            if (!resType.IsSubclassOf(typeof(Resource)))
+            if (!resType.IsSubclassOf(typeof(Resource)) && !typeof(IResourcePart).IsAssignableFrom(resType))
             {
                 throw new LibrettoException($"Class {resType.Name} is not inherited from {nameof(Resource)}");
             }

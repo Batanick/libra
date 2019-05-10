@@ -40,15 +40,15 @@ namespace libretto.libretto
                 .ToList();
 
             CheckTypes(types);
+            _resources.AddRange(types.Where(IsResource));
+            _parts.AddRange(types.Where(IsPart));
 
             var result = new List<ResourceType>();
-            _resources.AddRange(types.Where(IsResource));
             foreach (var res in _resources)
             {
                 result.Add(ProcessType(res, true));
             }
-
-            _parts.AddRange(types.Where(IsPart));
+            
             foreach (var part in _parts)
             {
                 result.Add(ProcessType(part, false));
@@ -60,7 +60,7 @@ namespace libretto.libretto
         private ResourceType ProcessType(Type t, bool resource)
         {
             _log.Info($"Processing: {t.Name}");
-            var name = ReflectionHelper.GetResourceName(t);
+            var name = ReflectionHelper.GetName(t);
 
             var props = new List<PropertyInfo>();
             foreach (var info in t.GetProperties())
@@ -100,7 +100,7 @@ namespace libretto.libretto
                 var compatibleTypes = GetCompatibleTypes(_resources, resType);
                 if (compatibleTypes.Count == 0)
                 {
-                    _log.Warn($"Unable to find potential reference candidates for: {resType.Name}, ignoring");
+                    _log.Warn($"Unable to find potential reference candidates for: {resType.Name}, ignoring {info.Name}");
                     return null;
                 }
                 
@@ -108,6 +108,24 @@ namespace libretto.libretto
                 {
                     Name = name,
                     Type = ObjectType.Ref,
+                    Title = title,
+                    AllowedTypes = compatibleTypes
+                };
+            }
+
+            if (IsPart(info.PropertyType))
+            {
+                var compatibleTypes = GetCompatibleTypes(_parts, info.PropertyType);
+                if (compatibleTypes.Count == 0)
+                {
+                    _log.Warn($"Unable to find potential candidates for: {info.PropertyType.Name}, ignoring {info.Name}");
+                    return null;
+                }
+                
+                return new PropertyInfo
+                {
+                    Name = name,
+                    Type = ObjectType.Object,
                     Title = title,
                     AllowedTypes = compatibleTypes
                 };
@@ -130,7 +148,7 @@ namespace libretto.libretto
         {
             return types
                 .Where(expected.IsAssignableFrom)
-                .Select(ReflectionHelper.GetResourceName)
+                .Select(ReflectionHelper.GetName)
                 .ToList();
         }
 
