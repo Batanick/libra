@@ -3,6 +3,6 @@ namespace libretto.model
 {
     public enum ObjectType
     {
-        obj, @ref, integer, number, @string, boolean, array
+        @object, @ref, integer, number, @string, boolean, array
     }
 }

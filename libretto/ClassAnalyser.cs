@@ -14,7 +14,7 @@ namespace libretto
 {
     public class ClassAnalyser
     {
-        private static Logger _log = LogManager.GetLogger(nameof(ClassAnalyser));
+        private static readonly Logger Log = LogManager.GetLogger(nameof(ClassAnalyser));
 
         private static readonly Dictionary<Type, ObjectType> PrimitiveTypesMapping = new Dictionary<Type, ObjectType>
         {
@@ -32,7 +32,7 @@ namespace libretto
         private readonly List<Type> _resources = new List<Type>();
         private readonly List<Type> _parts = new List<Type>();
 
-        public List<ResourceType> Process(List<Assembly> assemblies)
+        public List<ResourceInfo> Process(List<Assembly> assemblies)
         {
             var types = assemblies
                 .SelectMany(a => a.GetTypes())
@@ -44,7 +44,7 @@ namespace libretto
             _resources.AddRange(types.Where(IsResource));
             _parts.AddRange(types.Where(IsPart));
 
-            var result = new List<ResourceType>();
+            var result = new List<ResourceInfo>();
             foreach (var res in _resources)
             {
                 result.Add(ProcessType(res, true));
@@ -58,9 +58,9 @@ namespace libretto
             return result;
         }
 
-        private ResourceType ProcessType(Type t, bool resource)
+        private ResourceInfo ProcessType(Type t, bool resource)
         {
-            _log.Info($"Processing: {t.Name}");
+            Log.Info($"Processing: {t.Name}");
             var name = ReflectionHelper.GetName(t);
 
             var props = new List<PropertyInfo>();
@@ -83,10 +83,11 @@ namespace libretto
                 }
             }
 
-            return new ResourceType
+            return new ResourceInfo
             {
                 Id = name,
-                Properties = props
+                Properties = props,
+                Type = resource ? ResourceType.resource : ResourceType.part
             };
         }
 
@@ -123,7 +124,7 @@ namespace libretto
                 var compatibleTypes = GetCompatibleTypes(_resources, resType);
                 if (compatibleTypes.Count == 0)
                 {
-                    _log.Warn($"Unable to find potential reference candidates for: {resType.Name}, ignoring {name}");
+                    Log.Warn($"Unable to find potential reference candidates for: {resType.Name}, ignoring {name}");
                     return null;
                 }
 
@@ -141,14 +142,14 @@ namespace libretto
                 var compatibleTypes = GetCompatibleTypes(_parts, type);
                 if (compatibleTypes.Count == 0)
                 {
-                    _log.Warn($"Unable to find potential candidates for: {type.Name}, ignoring {name}");
+                    Log.Warn($"Unable to find potential candidates for: {type.Name}, ignoring {name}");
                     return null;
                 }
 
                 return new PropertyInfo
                 {
                     Name = name,
-                    Type = ObjectType.obj,
+                    Type = ObjectType.@object,
                     Title = title,
                     AllowedTypes = compatibleTypes
                 };

@@ -1,17 +1,9 @@
-using System.Collections.Generic;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Converters;
-using Newtonsoft.Json.Serialization;
-
+// ReSharper disable InconsistentNaming
 namespace libretto.model
 {
-    public class ResourceType
+    public enum ResourceType
     {
-        [JsonProperty("$id")]
-        public string Id { get; set; }
-        public string Title { get; set; }
-        [JsonConverter(typeof(StringEnumConverter))]
-        public ObjectType Type { get; set; }
-        public List<PropertyInfo> Properties { get; set; }
+        resource,
+        part
     }
 }

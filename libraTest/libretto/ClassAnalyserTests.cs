@@ -12,7 +12,7 @@ namespace libraTest.libretto
 {
     public class ClassAnalyserTests
     {
-        private List<ResourceType> _typeInfo;
+        private List<ResourceInfo> _typeInfo;
 
         [OneTimeSetUp]
         public void AnalyseThis()
@@ -28,12 +28,14 @@ namespace libraTest.libretto
             Contains("Grumpy", _typeInfo.Select(t => t.Id).ToList());
             Contains(nameof(NamelessResource), _typeInfo.Select(t => t.Id).ToList());
         }
-
+        
         [Test]
         public void SimpleFields_Analysed()
         {
             var resourceType = _typeInfo.First(r => r.Id == nameof(BaseTypesResource));
 
+            AreEqual(ResourceType.resource,resourceType.Type);
+            
             AssertProp(resourceType, nameof(BaseTypesResource.IntField), ObjectType.integer);
             AssertProp(resourceType, nameof(BaseTypesResource.LongField), ObjectType.integer);
             AssertProp(resourceType, nameof(BaseTypesResource.ByteField), ObjectType.integer);
@@ -103,7 +105,7 @@ namespace libraTest.libretto
         public void PartField_Analysed()
         {
             var resourceType = _typeInfo.First(r => r.Id == nameof(NestingPartResource));
-            var propertyInfo = AssertProp(resourceType, nameof(NestingPartResource.Part), ObjectType.obj);
+            var propertyInfo = AssertProp(resourceType, nameof(NestingPartResource.Part), ObjectType.@object);
             Contains(nameof(ResourcePart), propertyInfo.AllowedTypes);
             Contains(nameof(ResourcePart2), propertyInfo.AllowedTypes);
             IsFalse(propertyInfo.AllowedTypes.Contains(nameof(AbstractResourcePart)));
@@ -113,6 +115,7 @@ namespace libraTest.libretto
         public void ResourcePartFields_Processed()
         {
             var resourceType = _typeInfo.First(r => r.Id == nameof(ResourcePart2));
+            AreEqual(ResourceType.part,resourceType.Type);
             AssertProp(resourceType, nameof(ResourcePart2.BoolField), ObjectType.boolean);
             AssertProp(resourceType, nameof(ResourcePart2.IntField), ObjectType.integer);
             AssertProp(resourceType, nameof(ResourcePart2.StringField), ObjectType.@string);
@@ -126,19 +129,19 @@ namespace libraTest.libretto
             var intList = AssertProp(resourceType, nameof(ArrayResource.IntList), ObjectType.array);
             AreEqual(ObjectType.integer, intList.Elements.Type);
             var partList = AssertProp(resourceType, nameof(ArrayResource.PartList), ObjectType.array);
-            AreEqual(ObjectType.obj, partList.Elements.Type);
+            AreEqual(ObjectType.@object, partList.Elements.Type);
             var resList = AssertProp(resourceType, nameof(ArrayResource.ResourceList), ObjectType.array);
             AreEqual(ObjectType.@ref, resList.Elements.Type);
 
             var floatArr = AssertProp(resourceType, nameof(ArrayResource.FloatArray), ObjectType.array);
             AreEqual(ObjectType.number, floatArr.Elements.Type);
             var partArr = AssertProp(resourceType, nameof(ArrayResource.PartArray), ObjectType.array);
-            AreEqual(ObjectType.obj, partArr.Elements.Type);
+            AreEqual(ObjectType.@object, partArr.Elements.Type);
             var resArr = AssertProp(resourceType, nameof(ArrayResource.ResourceArray), ObjectType.array);
             AreEqual(ObjectType.@ref, resArr.Elements.Type);
         }
 
-        private static PropertyInfo AssertProp(ResourceType type, string propName, ObjectType objType)
+        private static PropertyInfo AssertProp(ResourceInfo type, string propName, ObjectType objType)
         {
             var props = type.Properties;
             IsNotNull(props);

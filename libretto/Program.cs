@@ -61,7 +61,7 @@ namespace libretto
             }
         }
 
-        private static List<ResourceType> AnalyseAssembly(List<Assembly> assemblies)
+        private static List<ResourceInfo> AnalyseAssembly(List<Assembly> assemblies)
         {
             _log.Info($"Analysing:");
             var classAnalyser = new ClassAnalyser();
@@ -70,7 +70,7 @@ namespace libretto
             return resourceTypes;
         }
 
-        private static void SerializeResults(string dir, List<ResourceType> resourceTypes)
+        private static void SerializeResults(string dir, List<ResourceInfo> resourceTypes)
         {
             _log.Info($"Saving results to {dir}");
             var serializer = new JsonSerializer();
@@ -106,7 +106,7 @@ namespace libretto
             LogManager.Configuration = config;
         }
 
-        private static string ToFileName(ResourceType type)
+        private static string ToFileName(ResourceInfo type)
         {
             return $"{type.Id}.schema.json";
         }
