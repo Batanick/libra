@@ -3,6 +3,9 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Reflection;
+using libra.core;
+using libra.core.utils;
+using libraTest.core;
 using libraUnity.libra.client;
 using libretto;
 using NUnit.Framework;
@@ -13,6 +16,7 @@ namespace libraTest.json
     public class JsonLoaderTests
     {
         private readonly List<Type> _allTypes = new List<Type>();
+        private readonly IResourceLogger _logger = TestLogger.Create(nameof(JsonLoaderTests));
 
         [OneTimeSetUp]
         public void SetUp()
@@ -26,17 +30,9 @@ namespace libraTest.json
         [Test]
         public void LoadAll_Success()
         {
-            var loader = new JsonLoader();
-
-            IsNotEmpty(_allTypes);
-            loader.Register(_allTypes);
-
-            var allFiles = LoadAll();
-            IsNotEmpty(allFiles);
-            var resources = loader.Parse(allFiles).ToList();
-
+            var resources = LoadAll();
+            IsNotEmpty(resources);
             IsFalse(resources.Any(r => r == null));
-            AreEqual(allFiles.Count, resources.Count);
         }
 
         [Test]
@@ -44,14 +40,20 @@ namespace libraTest.json
         {
         }
 
-        private List<Stream> LoadAll()
+        private List<Resource> LoadAll()
         {
-            var result = new List<Stream>();
-            foreach (string res in typeof(LibraTests).Assembly.GetManifestResourceNames())
+            var assembly = typeof(LibraTests).Assembly;
+            var loader = new JsonLoader(_logger);
+            loader.Register(_allTypes);
+            
+            var result = new List<Resource>();
+            foreach (string res in assembly.GetManifestResourceNames())
             {
                 if (res.EndsWith(".rs"))
                 {
-                    result.Add(typeof(LibraTests).Assembly.GetManifestResourceStream(res));
+                    _logger.LogInfo($"Parsing: {res}");
+                    var resource = loader.Parse(assembly.GetManifestResourceStream(res));
+                    result.Add(resource);
                 }
             }
 
