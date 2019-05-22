@@ -34,11 +34,7 @@ namespace libretto
 
         public List<ResourceInfo> Process(List<Assembly> assemblies)
         {
-            var types = assemblies
-                .SelectMany(a => a.GetTypes())
-                .Where(t => !t.IsAbstract)
-                .Where(t => !t.IsInterface)
-                .ToList();
+            var types = ExtractTypes(assemblies);
 
             CheckTypes(types);
             _resources.AddRange(types.Where(IsResource));
@@ -56,6 +52,17 @@ namespace libretto
             }
 
             return result;
+        }
+
+        public static List<Type> ExtractTypes(List<Assembly> assemblies)
+        {
+            var types = assemblies
+                .SelectMany(a => a.GetTypes())
+                .Where(t => !t.IsAbstract)
+                .Where(t => !t.IsInterface)
+                .ToList();
+
+            return types;
         }
 
         private ResourceInfo ProcessType(Type t, bool resource)
@@ -99,7 +106,7 @@ namespace libretto
             {
                 var elementType = GetElementType(info.PropertyType);
                 var elementInfo = ProcessInfoProperty(info.Name, title, elementType);
-                
+
                 // do not care here, since all info would be in the parent PropertyInfo
                 elementInfo.Name = null;
                 elementInfo.Title = null;
@@ -187,12 +194,12 @@ namespace libretto
             }
         }
 
-        private static bool IsPart(Type t)
+        public static bool IsPart(Type t)
         {
             return typeof(IResourcePart).IsAssignableFrom(t);
         }
 
-        private static bool IsResource(Type t)
+        public static bool IsResource(Type t)
         {
             return t.IsSubclassOf(typeof(Resource));
         }
