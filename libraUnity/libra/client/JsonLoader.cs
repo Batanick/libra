@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Runtime.CompilerServices;
 using System.Text;
 using libra.core;
 using libra.core.exceptions;
@@ -14,6 +13,22 @@ namespace libraUnity.libra.client
     public class JsonLoader : DefaultSerializationBinder
     {
         private readonly Dictionary<string, Type> _typesRegistry = new Dictionary<string, Type>();
+
+        private readonly JsonSerializerSettings _settings;
+        private readonly IResourceLogger _logger;
+
+        public JsonLoader(IResourceLogger logger)
+        {
+            _logger = logger;
+            _settings = new JsonSerializerSettings
+            {
+                ContractResolver = new ContractResolver(),
+                Converters = new List<JsonConverter> {new ResourceRefConverter()},
+                Binder = this,
+                TypeNameHandling = TypeNameHandling.Auto,
+                MetadataPropertyHandling = MetadataPropertyHandling.ReadAhead
+            };
+        }
 
         public void Register(List<Type> types)
         {
@@ -29,33 +44,14 @@ namespace libraUnity.libra.client
             }
         }
 
-        public IEnumerable<Resource> Parse(List<Stream> jsons)
-        {
-            var settings = new JsonSerializerSettings
-            {
-                ContractResolver = new DefaultContractResolver(),
-                Binder = this,
-                TypeNameHandling = TypeNameHandling.Auto,
-                MetadataPropertyHandling = MetadataPropertyHandling.ReadAhead
-            };
-
-            var result = new List<Resource>(jsons.Count);
-            foreach (var stream in jsons)
-            {
-                result.Add(Parse(stream, settings));
-            }
-
-            return result;
-        }
-
-        private Resource Parse(Stream stream, JsonSerializerSettings settings)
+        public Resource Parse(Stream stream)
         {
             using (var reader = new StreamReader(stream, Encoding.UTF8))
             {
                 var value = reader.ReadToEnd();
                 try
                 {
-                    return JsonConvert.DeserializeObject<Resource>(value, settings);
+                    return JsonConvert.DeserializeObject<Resource>(value, _settings);
                 }
                 catch (JsonException e)
                 {
@@ -71,6 +67,7 @@ namespace libraUnity.libra.client
                 return type;
             }
 
+            _logger.LogWarn($"Unable to resolve type-name: {typeName}");
             return base.BindToType(assemblyName, typeName);
         }
     }

@@ -1,5 +1,5 @@
 {
-	"$id": "2844969a-3bdb-4bd5-8ecc-4bb6a76edb14",
+	"resId": "2844969a-3bdb-4bd5-8ecc-4bb6a76edb14",
 	"$type": "ArrayResource",
 	"FloatArray": [
 		"1",

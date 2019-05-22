@@ -9,35 +9,40 @@ namespace libraUnity.libra.client
 {
     public class ResourceRefConverter : JsonConverter
     {
+        public override bool CanRead => true;
+        public override bool CanWrite => false;
+
         public override void WriteJson(JsonWriter writer, object value, JsonSerializer serializer)
         {
-            JToken t = JToken.FromObject(value);
-
-            if (t.Type != JTokenType.Object)
-            {
-                t.WriteTo(writer);
-            }
-            else
-            {
-                JObject o = (JObject)t;
-                IList<string> propertyNames = o.Properties().Select(p => p.Name).ToList();
-
-                o.AddFirst(new JProperty("Keys", new JArray(propertyNames)));
-
-                o.WriteTo(writer);
-            }
+            throw new NotImplementedException("Unnecessary because CanWrite is false. The type will skip the converter.");
         }
 
         public override object ReadJson(JsonReader reader, Type objectType, object existingValue, JsonSerializer serializer)
         {
-            throw new NotImplementedException("Unnecessary because CanRead is false. The type will skip the converter.");
-        }
+            if (reader.TokenType == JsonToken.Null)
+            {
+                return null;
+            }
+            
+            if (reader.TokenType != JsonToken.String)
+            {
+                throw new JsonReaderException($"Incorrect token type for ResourceRef: {reader.TokenType}");
+            }
 
-        public override bool CanRead => false;
+            var token = JToken.Load(reader);
+            if (!Guid.TryParse(token.Value<string>(), out var guid))
+            {
+                throw new JsonReaderException($"Incorrect Guid format: {token}");
+            }
+
+            var createMethod = objectType.GetMethod(nameof(ResourceRef<Resource>.Create));
+            var result = createMethod.Invoke(null, new object[] {guid});
+            return result;
+        }
 
         public override bool CanConvert(Type objectType)
         {
-            return objectType == typeof(ResourceRef<>);
+            return objectType.IsGenericType && objectType.GetGenericTypeDefinition() == typeof(ResourceRef<>);
         }
     }
 }
