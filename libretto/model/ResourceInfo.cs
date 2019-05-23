@@ -6,7 +6,7 @@ namespace libretto.model
 {
     public class ResourceInfo
     {
-        [JsonProperty("$id")] public string Id { get; set; }
+        [JsonProperty("id")] public string Id { get; set; }
 
         [JsonProperty("$type")]
         [JsonConverter(typeof(StringEnumConverter))]

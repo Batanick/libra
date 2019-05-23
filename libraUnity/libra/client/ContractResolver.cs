@@ -16,7 +16,7 @@ namespace libraUnity.libra.client
                 if (property.PropertyName.Equals(nameof(Resource.ResourceId), StringComparison.OrdinalIgnoreCase))
                 {
                     property.Required = Required.Always;
-                    property.PropertyName = "resId";
+                    property.PropertyName = "id";
                 }
 
                 return property;
