@@ -25,7 +25,13 @@ namespace libra.core
                 throw new NullResourceReferenceException();
             }
 
-            return _resById.GetValueOrDefault(reference.ResourceId) as T;
+            Resource res;
+            if (_resById.TryGetValue(reference.ResourceId, out res))
+            {
+                return res as T;
+            }
+
+            return null;
         }
 
         public IEnumerable<T> GetAll<T>() where T : Resource
@@ -47,21 +53,22 @@ namespace libra.core
 
             foreach (var resource in resources)
             {
-                if (resourceSystem._resById.TryAdd(resource.ResourceId, resource))
-                {
-                    var list = resourceSystem._resByType.GetValueOrDefault(resource.GetType());
-                    if (list == null)
-                    {
-                        list = new List<Resource>();
-                        resourceSystem._resByType.Add(resource.GetType(), list);
-                    }
-
-                    list.Add(resource);
-                }
-                else
+                Resource existing;
+                if (resourceSystem._resById.TryGetValue(resource.ResourceId, out existing))
                 {
                     logger.LogWarn(string.Format("Duplicate id: {0}, ignoring", resource.ResourceId));
+                    continue;
                 }
+
+                resourceSystem._resById.Add(resource.ResourceId, resource);
+                IList resByType;
+                if (!resourceSystem._resByType.TryGetValue(resource.GetType(), out resByType))
+                {
+                    resByType = new List<Resource>();
+                    resourceSystem._resByType.Add(resource.GetType(), resByType);
+                }
+
+                resByType.Add(resource);
             }
 
             logger.LogInfo(string.Format("Resource system initialized, total: {0}", resourceSystem._resById.Count));

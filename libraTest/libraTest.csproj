@@ -3,6 +3,7 @@
     <PropertyGroup>
         <IsPackable>false</IsPackable>
         <TargetFramework>netcoreapp2.1</TargetFramework>
+        <OutputType>Library</OutputType>
     </PropertyGroup>
 
     <ItemGroup>

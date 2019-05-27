@@ -1,8 +1,8 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
-        <TargetFramework>netcoreapp2.1</TargetFramework>
         <LangVersion>4</LangVersion>
+        <TargetFrameworks>netstandard2.0;netcoreapp2.1</TargetFrameworks>
     </PropertyGroup>
 
 </Project>

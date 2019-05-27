@@ -32,6 +32,7 @@ namespace libretto
                     v => showHelp = v != null
                 }
             };
+            var extra = p.Parse(args);
 
             if (showHelp)
             {
@@ -41,7 +42,7 @@ namespace libretto
 
             try
             {
-                var extra = p.Parse(args);
+                
                 var assemblies = new List<Assembly>();
                 foreach (var path in extra)
                 {
