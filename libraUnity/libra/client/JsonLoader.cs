@@ -1,6 +1,8 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
+using System.Reflection;
 using System.Text;
 using libra.core;
 using libra.core.exceptions;
@@ -30,10 +32,21 @@ namespace libraUnity.libra.client
             };
         }
 
+        public void Scan(List<Assembly> assemblies)
+        {
+            var types = assemblies.SelectMany(a => a.GetTypes()).ToList();
+            Register(types);
+        }
+
         public void Register(List<Type> types)
         {
             foreach (var type in types)
             {
+                if (!type.IsSubclassOf(typeof(Resource)) && !typeof(IResourcePart).IsAssignableFrom(type) || type.IsInterface || type.IsAbstract)
+                {
+                    continue;
+                }
+
                 var name = ReflectionUtils.GetTypeName(type);
                 if (_typesRegistry.ContainsKey(name))
                 {
@@ -49,14 +62,19 @@ namespace libraUnity.libra.client
             using (var reader = new StreamReader(stream, Encoding.UTF8))
             {
                 var value = reader.ReadToEnd();
-                try
-                {
-                    return JsonConvert.DeserializeObject<Resource>(value, _settings);
-                }
-                catch (JsonException e)
-                {
-                    throw new ResourceSystemException("Unable to parse resource", e);
-                }
+                return Parse(value);
+            }
+        }
+
+        public Resource Parse(string value)
+        {
+            try
+            {
+                return JsonConvert.DeserializeObject<Resource>(value, _settings);
+            }
+            catch (JsonException e)
+            {
+                throw new ResourceSystemException("Unable to parse resource", e);
             }
         }
 

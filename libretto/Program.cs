@@ -109,7 +109,7 @@ namespace libretto
 
         private static string ToFileName(ResourceInfo type)
         {
-            return $"{type.Id}.schema.json";
+            return $"{type.Id}.schema";
         }
     }
 }
