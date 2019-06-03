@@ -15,6 +15,8 @@ namespace libretto.model
         public ObjectType Type { get; set; }
         [JsonProperty("allowedTypes")]
         public List<string> AllowedTypes { get; set; }
+        [JsonProperty("allowedValues")]
+        public List<string> AllowedValues { get; set; }
         [JsonProperty("elements")]
         public PropertyInfo Elements { get; set; }
     }
