@@ -28,14 +28,14 @@ namespace libraTest.libretto
             Contains("Grumpy", _typeInfo.Select(t => t.Id).ToList());
             Contains(nameof(NamelessResource), _typeInfo.Select(t => t.Id).ToList());
         }
-        
+
         [Test]
         public void SimpleFields_Analysed()
         {
             var resourceType = _typeInfo.First(r => r.Id == nameof(BaseTypesResource));
 
-            AreEqual(ResourceType.resource,resourceType.Type);
-            
+            AreEqual(ResourceType.resource, resourceType.Type);
+
             AssertProp(resourceType, nameof(BaseTypesResource.IntField), ObjectType.integer);
             AssertProp(resourceType, nameof(BaseTypesResource.LongField), ObjectType.integer);
             AssertProp(resourceType, nameof(BaseTypesResource.ByteField), ObjectType.integer);
@@ -115,7 +115,7 @@ namespace libraTest.libretto
         public void ResourcePartFields_Processed()
         {
             var resourceType = _typeInfo.First(r => r.Id == nameof(ResourcePart2));
-            AreEqual(ResourceType.part,resourceType.Type);
+            AreEqual(ResourceType.part, resourceType.Type);
             AssertProp(resourceType, nameof(ResourcePart2.BoolField), ObjectType.boolean);
             AssertProp(resourceType, nameof(ResourcePart2.IntField), ObjectType.integer);
             AssertProp(resourceType, nameof(ResourcePart2.StringField), ObjectType.@string);
@@ -139,6 +139,20 @@ namespace libraTest.libretto
             AreEqual(ObjectType.@object, partArr.Elements.Type);
             var resArr = AssertProp(resourceType, nameof(ArrayResource.ResourceArray), ObjectType.array);
             AreEqual(ObjectType.@ref, resArr.Elements.Type);
+        }
+
+        [Test]
+        public void EnumClass_Processed()
+        {
+            var resourceType = _typeInfo.First(r => r.Id == nameof(EnumResource));
+
+            var enumList = AssertProp(resourceType, nameof(EnumResource.Enum), ObjectType.@enum);
+            AreEqual(new List<string>
+            {
+                TestEnum.EnumValue1.ToString(),
+                TestEnum.EnumValue2.ToString(),
+                TestEnum.EnumValue3.ToString()
+            }, enumList.AllowedValues);
         }
 
         private static PropertyInfo AssertProp(ResourceInfo type, string propName, ObjectType objType)

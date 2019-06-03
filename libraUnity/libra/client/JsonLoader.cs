@@ -8,6 +8,7 @@ using libra.core;
 using libra.core.exceptions;
 using libra.core.utils;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Converters;
 using Newtonsoft.Json.Serialization;
 
 namespace libraUnity.libra.client
@@ -25,10 +26,14 @@ namespace libraUnity.libra.client
             _settings = new JsonSerializerSettings
             {
                 ContractResolver = new ContractResolver(),
-                Converters = new List<JsonConverter> {new ResourceRefConverter()},
+                Converters = new List<JsonConverter>
+                {
+                    new ResourceRefConverter(),
+                    new StringEnumConverter()
+                },
                 Binder = this,
                 TypeNameHandling = TypeNameHandling.Auto,
-                MetadataPropertyHandling = MetadataPropertyHandling.ReadAhead
+                MetadataPropertyHandling = MetadataPropertyHandling.ReadAhead,
             };
         }
 

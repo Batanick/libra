@@ -161,6 +161,17 @@ namespace libretto
                     AllowedTypes = compatibleTypes
                 };
             }
+            
+            if (type.IsEnum)
+            {
+                return new PropertyInfo
+                {
+                    Name = name,
+                    Type = ObjectType.@enum,
+                    Title = title,
+                    AllowedValues = Enum.GetNames(type).ToList()
+                };
+            }
 
             if (PrimitiveTypesMapping.TryGetValue(type, out var objectType))
             {
