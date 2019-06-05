@@ -7,7 +7,7 @@ Libra is a framework designed to ease creating and managing big sets of configur
 - cross platform. Even though we targeting C# and Unity stack, we should not use platform dependent frameworks in core libraries. 
 
 ## Definitions
-* **Resource type** - template for creating **resources**. Can contain different variety of fields, but always contain an *id* as one of elements 
+* **Resource schema** - template for creating **resources**. Can contain different variety of fields, but always contain an *id* as one of elements 
 * **Resource** - an consistent set of data describing instance of **Resource type**. Contains unique **id** value.
 * **Resource system** - a consistent set of *resources*
 * **Resource id** - unique *resource* identifier. Framework provides runtime guarantees that *id* is unique inside resource system instance. 

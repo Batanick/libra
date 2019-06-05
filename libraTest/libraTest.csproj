@@ -19,7 +19,7 @@
     </ItemGroup>
 
     <ItemGroup>
-        <ProjectReference Include="..\libraUnity\libraUnity.csproj" />
+        <ProjectReference Include="..\libraUtils\libraUtils.csproj" />
         <ProjectReference Include="..\libra\libra.csproj" />
         <ProjectReference Include="..\libretto\libretto.csproj" />
     </ItemGroup>
